@@ -9,6 +9,7 @@
 std::vector<int> clients;
 std::mutex clients_mutex;
 
+// Esta función se ejecuta en un hilo separado para manejar la comunicación con cada cliente.
 void handle_client(int client_socket) {
     char buffer[1024];
     std::string welcome_msg = "Welcome to the chat!";
@@ -16,6 +17,7 @@ void handle_client(int client_socket) {
 
     while (true) {
         ssize_t recv_len = recv(client_socket, buffer, sizeof(buffer), 0);
+        // Bucle de recepción de mensajes del cliente.
         if (recv_len <= 0) {
             std::lock_guard<std::mutex> lock(clients_mutex);
             clients.erase(std::remove(clients.begin(), clients.end(), client_socket), clients.end());
@@ -26,6 +28,7 @@ void handle_client(int client_socket) {
         buffer[recv_len] = '\0';
         std::string message(buffer);
 
+        // Bucle de reenvío de mensajes.
         std::lock_guard<std::mutex> lock(clients_mutex);
         for (int client : clients) {
             if (client != client_socket) {
@@ -48,6 +51,7 @@ int main() {
 
     std::cout << "Server is listening on port 1234..." << std::endl;
 
+    // El servidor entra en un bucle infinito para aceptar conexiones entrantes. 
     while (true) {
         int client_socket = accept(server_socket, nullptr, nullptr);
         std::cout << "New client connected!" << std::endl;
