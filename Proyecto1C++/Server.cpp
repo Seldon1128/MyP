@@ -5,19 +5,19 @@
 #include <mutex>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <algorithm>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 std::vector<int> clients;
 std::mutex clients_mutex;
 
-// Esta función se ejecuta en un hilo separado para manejar la comunicación con cada cliente.
 void handle_client(int client_socket) {
     char buffer[1024];
-    std::string welcome_msg = "Welcome to the chat!";
-    send(client_socket, welcome_msg.c_str(), welcome_msg.length(), 0);
 
     while (true) {
         ssize_t recv_len = recv(client_socket, buffer, sizeof(buffer), 0);
-        // Bucle de recepción de mensajes del cliente.
         if (recv_len <= 0) {
             std::lock_guard<std::mutex> lock(clients_mutex);
             clients.erase(std::remove(clients.begin(), clients.end(), client_socket), clients.end());
@@ -26,13 +26,31 @@ void handle_client(int client_socket) {
         }
 
         buffer[recv_len] = '\0';
-        std::string message(buffer);
+        std::string received_message(buffer);
 
-        // Bucle de reenvío de mensajes.
-        std::lock_guard<std::mutex> lock(clients_mutex);
-        for (int client : clients) {
-            if (client != client_socket) {
-                send(client, message.c_str(), message.length(), 0);
+        // Convertir el mensaje recibido en JSON
+        json message_json = json::parse(received_message);
+
+        // Verificar si el tipo de mensaje es IDENTIFY
+        if (message_json.contains("type") && message_json["type"] == "IDENTIFY") {
+            std::string username = message_json["username"];
+            std::cout << "Usuario identificado: " << username << std::endl;
+
+            // Aquí puedes hacer algo con el nombre del usuario, como almacenarlo o enviarlo a otros clientes
+
+            // Crear y enviar un mensaje de bienvenida personalizado en formato JSON
+            json welcome_msg;
+            welcome_msg["message"] = "¡Bienvenido, " + username + "!";
+            std::string welcome_str = welcome_msg.dump();
+            send(client_socket, welcome_str.c_str(), welcome_str.length(), 0);
+        } else {
+            // Reenviar el mensaje a todos los clientes excepto al emisor
+            std::lock_guard<std::mutex> lock(clients_mutex);
+            for (int client : clients) {
+                if (client != client_socket) {
+                    std::string msg_to_send = message_json.dump();
+                    send(client, msg_to_send.c_str(), msg_to_send.length(), 0);
+                }
             }
         }
     }
@@ -51,7 +69,6 @@ int main() {
 
     std::cout << "Server is listening on port 1234..." << std::endl;
 
-    // El servidor entra en un bucle infinito para aceptar conexiones entrantes. 
     while (true) {
         int client_socket = accept(server_socket, nullptr, nullptr);
         std::cout << "New client connected!" << std::endl;

@@ -1,0 +1,4 @@
+/Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/build/CMakeFiles/server.dir
+/Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/build/CMakeFiles/client.dir
+/Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/build/CMakeFiles/edit_cache.dir
+/Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/build/CMakeFiles/rebuild_cache.dir
