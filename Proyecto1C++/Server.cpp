@@ -38,11 +38,12 @@ void handle_client(int client_socket) {
         // Convertir el mensaje recibido en JSON
         json message_json = json::parse(received_message);
 
-        // Verificar si el tipo de mensaje es IDENTIFY
+        // Verificar el tipo de mensaje
         if (message_json.contains("type") && message_json["type"] == "IDENTIFY") {
             client_name = message_json["username"];
 
-            std::lock_guard<std::mutex> lock(clients_mutex);
+            std::lock_guard<std::mutex> lock(clients_mutex); 
+            // Checar si el nombre de usuario existe
             auto it = std::find_if(clients.begin(), clients.end(), [&](const ClientInfo& client) { return client.name == client_name; });
 
             if (it != clients.end()) {
@@ -70,6 +71,7 @@ void handle_client(int client_socket) {
                 json new_user_msg;
                 new_user_msg["type"] = "NEW_USER";
                 new_user_msg["username"] = client_name;
+                // Representación en cadena del JSON
                 std::string new_user_str = new_user_msg.dump();
 
                 for (const auto& client : clients) {
@@ -78,8 +80,22 @@ void handle_client(int client_socket) {
                     }
                 }
             }
-        } else {
-            // Reenviar el mensaje a todos los clientes excepto al emisor
+        } else if (message_json.contains("type") && message_json["type"] == "PUBLIC_TEXT"){
+            // Reenviar a los demás usuarios mensaje publico
+                json public_text_msg;
+                public_text_msg["type"] = "PUBLIC_TEXT_FROM";
+                public_text_msg["username"] = client_name;
+                public_text_msg["text"] = message_json["text"];
+                std::string public_msg_str = public_text_msg.dump();
+
+                for (const auto& client : clients) {
+                    if (client.socket != client_socket) {
+                        send(client.socket, public_msg_str.c_str(), public_msg_str.length(), 0);
+                    }
+                }
+
+        }else{
+            // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
             std::lock_guard<std::mutex> lock(clients_mutex);
             for (const auto& client : clients) {
                 if (client.socket != client_socket) {
