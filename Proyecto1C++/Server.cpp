@@ -10,17 +10,24 @@
 
 using json = nlohmann::json;
 
-std::vector<int> clients;
+struct ClientInfo {
+    int socket;
+    std::string name;
+};
+
+std::vector<ClientInfo> clients;
 std::mutex clients_mutex;
 
 void handle_client(int client_socket) {
     char buffer[1024];
+    std::string client_name;
 
     while (true) {
         ssize_t recv_len = recv(client_socket, buffer, sizeof(buffer), 0);
         if (recv_len <= 0) {
             std::lock_guard<std::mutex> lock(clients_mutex);
-            clients.erase(std::remove(clients.begin(), clients.end(), client_socket), clients.end());
+            clients.erase(std::remove_if(clients.begin(), clients.end(), 
+                [&](const ClientInfo& client) { return client.socket == client_socket; }), clients.end());
             close(client_socket);
             break;
         }
@@ -33,23 +40,51 @@ void handle_client(int client_socket) {
 
         // Verificar si el tipo de mensaje es IDENTIFY
         if (message_json.contains("type") && message_json["type"] == "IDENTIFY") {
-            std::string username = message_json["username"];
-            std::cout << "Usuario identificado: " << username << std::endl;
+            client_name = message_json["username"];
 
-            // Aquí puedes hacer algo con el nombre del usuario, como almacenarlo o enviarlo a otros clientes
+            std::lock_guard<std::mutex> lock(clients_mutex);
+            auto it = std::find_if(clients.begin(), clients.end(), [&](const ClientInfo& client) { return client.name == client_name; });
 
-            // Crear y enviar un mensaje de bienvenida personalizado en formato JSON
-            json welcome_msg;
-            welcome_msg["message"] = "¡Bienvenido, " + username + "!";
-            std::string welcome_str = welcome_msg.dump();
-            send(client_socket, welcome_str.c_str(), welcome_str.length(), 0);
+            if (it != clients.end()) {
+                // Si el nombre de usuario ya existe, enviar respuesta de error
+                json response;
+                response["type"] = "RESPONSE";
+                response["operation"] = "IDENTIFY";
+                response["result"] = "USER_ALREADY_EXISTS";
+                response["extra"] = client_name;
+                std::string response_str = response.dump();
+                send(client_socket, response_str.c_str(), response_str.length(), 0);
+            } else {
+                // Si el nombre de usuario no existe, añadir al cliente y enviar respuesta de éxito
+                clients.push_back({client_socket, client_name});
+
+                json response;
+                response["type"] = "RESPONSE";
+                response["operation"] = "IDENTIFY";
+                response["result"] = "SUCCESS";
+                response["extra"] = client_name;
+                std::string response_str = response.dump();
+                send(client_socket, response_str.c_str(), response_str.length(), 0);
+
+                // Notificar a los demás clientes que un nuevo usuario se ha conectado
+                json new_user_msg;
+                new_user_msg["type"] = "NEW_USER";
+                new_user_msg["username"] = client_name;
+                std::string new_user_str = new_user_msg.dump();
+
+                for (const auto& client : clients) {
+                    if (client.socket != client_socket) {
+                        send(client.socket, new_user_str.c_str(), new_user_str.length(), 0);
+                    }
+                }
+            }
         } else {
             // Reenviar el mensaje a todos los clientes excepto al emisor
             std::lock_guard<std::mutex> lock(clients_mutex);
-            for (int client : clients) {
-                if (client != client_socket) {
+            for (const auto& client : clients) {
+                if (client.socket != client_socket) {
                     std::string msg_to_send = message_json.dump();
-                    send(client, msg_to_send.c_str(), msg_to_send.length(), 0);
+                    send(client.socket, msg_to_send.c_str(), msg_to_send.length(), 0);
                 }
             }
         }
@@ -72,9 +107,6 @@ int main() {
     while (true) {
         int client_socket = accept(server_socket, nullptr, nullptr);
         std::cout << "New client connected!" << std::endl;
-
-        std::lock_guard<std::mutex> lock(clients_mutex);
-        clients.push_back(client_socket);
 
         std::thread client_thread(handle_client, client_socket);
         client_thread.detach();

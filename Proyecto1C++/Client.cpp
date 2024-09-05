@@ -21,7 +21,25 @@ void listen_for_messages(int socket) {
 
         // Parsear el mensaje JSON recibido
         json message_json = json::parse(received_message);
-        std::cout << "Received: " << message_json["message"] << std::endl;
+
+        // Manejar los diferentes tipos de mensajes
+        if (message_json["type"] == "NEW_USER") {
+            // Si el mensaje es de tipo NEW_USER, imprimir que un nuevo usuario se ha unido
+            std::cout << "Nuevo usuario se ha unido: " << message_json["username"] << std::endl;
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "IDENTIFY") {
+            // Si el mensaje es de tipo RESPONSE y la operación es IDENTIFY
+            if (message_json["result"] == "SUCCESS") {
+                std::cout << "Bienvenido, " << message_json["extra"] << "!" << std::endl;
+            } else if (message_json["result"] == "USER_ALREADY_EXISTS") {
+                std::cout << "El nombre de usuario '" << message_json["extra"] << "' ya está en uso." << std::endl;
+                // Cerrar el socket y terminar el programa si el nombre ya existe
+                close(socket);
+                exit(0);  // Finaliza el programa
+            }
+        } else {
+            // Mostrar otros tipos de mensajes no manejados explícitamente
+            std::cout << "Received: " << message_json.dump() << std::endl;
+        }
     }
 }
 
