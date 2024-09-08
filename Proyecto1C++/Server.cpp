@@ -13,14 +13,30 @@ using json = nlohmann::json;
 struct ClientInfo {
     int socket;
     std::string name;
+    std::string status;
 };
 
 std::vector<ClientInfo> clients;
 std::mutex clients_mutex;
 
+void update_client_status(int client_socket, const std::string& new_status) {
+    // Bloquear el mutex para asegurar acceso exclusivo a la lista de clientes
+    std::lock_guard<std::mutex> lock(clients_mutex);
+
+    // Buscar el cliente por su socket
+    for (auto& client : clients) {
+        if (client.socket == client_socket) {
+            // Actualizar el estado del cliente
+            client.status = new_status;
+            return; // Salir de la función después de actualizar el estado
+        }
+    }
+}
+
 void handle_client(int client_socket) {
     char buffer[1024];
     std::string client_name;
+    std::string client_status = "ACTIVE";
 
     while (true) {
         ssize_t recv_len = recv(client_socket, buffer, sizeof(buffer), 0);
@@ -57,7 +73,7 @@ void handle_client(int client_socket) {
                 send(client_socket, response_str.c_str(), response_str.length(), 0);
             } else {
                 // Si el nombre de usuario no existe, añadir al cliente y enviar respuesta de éxito
-                clients.push_back({client_socket, client_name});
+                clients.push_back({client_socket, client_name, client_status});
 
                 json response;
                 response["type"] = "RESPONSE";
@@ -94,7 +110,49 @@ void handle_client(int client_socket) {
                     }
                 }
 
-        }else{
+        }else if(message_json.contains("type") && message_json["type"] == "USERS"){
+            // El servidor responde un diccionario con los nombres de usuario y sus estados
+            json response;
+            response["type"] = "USER_LIST";
+            
+            json users;
+            {
+                std::lock_guard<std::mutex> lock(clients_mutex);
+                for (const auto& client : clients) {
+                    users[client.name] = client.status;
+                }
+            }
+
+            response["users"] = users;
+            std::string response_str = response.dump();
+            send(client_socket, response_str.c_str(), response_str.length(), 0);
+
+        }else if (message_json.contains("type") && message_json["type"] == "STATUS"){
+             std::string new_status = message_json["status"];
+            // Verificar si el nuevo estado es igual al estado actual del cliente
+            if (client_status == new_status) {
+                continue; // Si el estado es el mismo, no hacer nada y continuar con el próximo ciclo
+            }
+
+            // Actualizar el estado del cliente
+            update_client_status(client_socket, new_status);
+
+            // Notificar a los demás clientes que un usuario se ha cambiado su estado
+            json response;
+            response["type"] = "NEW_STATUS";
+            response["username"] = client_name;
+            response["status"] = new_status;
+
+            // Representación en cadena del JSON
+            std::string response_str = response.dump();
+
+            // Enviar el mensaje a todos los clientes excepto al que hizo el cambio
+            for (const auto& client : clients) {
+                if (client.socket != client_socket) {
+                    send(client.socket, response_str.c_str(), response_str.length(), 0);
+                }
+            }
+        } else {
             // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
             std::lock_guard<std::mutex> lock(clients_mutex);
             for (const auto& client : clients) {
