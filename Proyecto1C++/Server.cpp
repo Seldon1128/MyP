@@ -111,7 +111,7 @@ void handle_client(int client_socket) {
                 }
 
         }else if(message_json.contains("type") && message_json["type"] == "TEXT"){
-            // Textos Privados
+            // Manejo de Textos Privados 
             std::string target_username = message_json["username"];
             std::string message_text = message_json["text"];
             bool user_found = false;
