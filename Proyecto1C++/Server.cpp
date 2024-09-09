@@ -110,6 +110,43 @@ void handle_client(int client_socket) {
                     }
                 }
 
+        }else if(message_json.contains("type") && message_json["type"] == "TEXT"){
+            // Textos Privados
+            std::string target_username = message_json["username"];
+            std::string message_text = message_json["text"];
+            bool user_found = false;
+
+            std::lock_guard<std::mutex> lock(clients_mutex); // Asegurar acceso exclusivo a la lista de clientes
+
+            // Inicializar un iterador para recorrer la lista de clientes
+            auto it = clients.begin();
+
+            // Recorrer la lista de clientes para buscar al destinatario
+            while (it != clients.end()) {
+            // Comprobar si el nombre del cliente actual coincide con el nombre del destinatario
+                if (it->name == target_username) {
+                    user_found = true;  // Usuario encontrado
+                    break;  // Salir del bucle
+                }
+                ++it;  // Avanzar al siguiente cliente en la lista
+            }
+
+            json private_text_msg;
+            if (user_found){
+                private_text_msg["type"] = "TEXT_FROM";
+                private_text_msg["username"] = client_name;
+                private_text_msg["text"] = message_text;
+                std::string private_msg_str = private_text_msg.dump();
+                send(it->socket, private_msg_str.c_str(), private_msg_str.length(), 0);
+            } else {
+                private_text_msg["type"] = "RESPONSE";
+                private_text_msg["operation"] = "TEXT";
+                private_text_msg["result"] = "NO_SUCH_USER";
+                private_text_msg["extra"] = target_username;
+                std::string private_msg_str = private_text_msg.dump();
+                send(client_socket, private_msg_str.c_str(), private_msg_str.length(), 0);
+            }
+
         }else if(message_json.contains("type") && message_json["type"] == "USERS"){
             // El servidor responde un diccionario con los nombres de usuario y sus estados
             json response;

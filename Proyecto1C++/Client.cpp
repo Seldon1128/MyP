@@ -41,11 +41,18 @@ void listen_for_messages(int socket) {
                 close(socket);
                 exit(0);  // Finaliza el programa
             }
-        } else if (message_json["type"] == "PUBLIC_TEXT_FROM"){ 
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "TEXT" && message_json["result"] == "NO_SUCH_USER"){
+            std::cout << "El nombre de usuario '" << message_json["extra"] << "' no existe." << std::endl;
+
+        }else if (message_json["type"] == "PUBLIC_TEXT_FROM"){ 
             std::string username = message_json["username"];
             std::string text = message_json["text"];
             std::cout << username << ": " << text << std::endl;
 
+        }else if(message_json["type"] == "TEXT_FROM"){
+            std::string username_priv = message_json["username"];
+            std::string text_priv = message_json["text"];
+            std::cout << "Mensaje Privado -> " << username_priv << ": " << text_priv << std::endl;
         }else if(message_json["type"] == "USER_LIST"){
             std::cout << "Usuarios conectados y sus estados:\n";
             for (auto it = message_json["users"].begin(); it != message_json["users"].end(); ++it) {
@@ -134,7 +141,18 @@ int main() {
                 std::cout << "Opción no válida. Inténtalo de nuevo. Regresa al chat principal." << std::endl;
                 continue;
             }
-        } else {
+        } else if(uppercase_message == "/TEXT"){
+            message_json["type"] = "TEXT";
+            std::string username_msg;
+            std::string mensaje_priv;
+            std::cout << "Ingresa el username del usuario\n";
+            std::getline(std::cin, username_msg);
+            std::string username_msg1 = trim(username_msg);
+            std::cout << "Ingresa el mensaje\n";
+            std::getline(std::cin, mensaje_priv);
+            message_json["username"] = username_msg1;
+            message_json["text"] = mensaje_priv;
+        }else {
         message_json["type"] = "PUBLIC_TEXT";
         message_json["text"] = message;
         }
@@ -142,7 +160,6 @@ int main() {
         msg_to_send = message_json.dump();
         send(client_socket, msg_to_send.c_str(), msg_to_send.length(), 0);
     }
-
     close(client_socket);
     return 0;
 }
