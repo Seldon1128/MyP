@@ -7,14 +7,9 @@
 #include <netinet/in.h>
 #include <algorithm>
 #include <nlohmann/json.hpp>
+#include "Room.h"
 
 using json = nlohmann::json;
-
-struct ClientInfo {
-    int socket;
-    std::string name;
-    std::string status;
-};
 
 std::vector<ClientInfo> clients;
 std::mutex clients_mutex;
@@ -190,7 +185,34 @@ void handle_client(int client_socket) {
                     send(client.socket, response_str.c_str(), response_str.length(), 0);
                 }
             }
-        } else {
+        } else if(message_json.contains("type") && message_json["type"] == "NEW_ROOM"){
+            std::string new_room_name = message_json["roomname"];
+            json response;
+
+            if (Room::room_exists(new_room_name)) {
+                //Caso en que el nombre del cuarto existe
+                response["type"] = "RESPONSE";
+                response["operation"] = "NEW_ROOM";
+                response["result"] = "ROOM_ALREADY_EXISTS";
+                response["extra"] = new_room_name;
+            } else {
+                //Caso en que el nombre del cuarto no existe se crea uno y se agrega a el
+                response["type"] = "RESPONSE";
+                response["operation"] = "NEW_ROOM";
+                response["result"] = "SUCCESS";
+                response["extra"] = new_room_name;
+                Room::handle_new_room(new_room_name);
+                // Crear e inicializar una instancia de ClientInfo para el cliente que se unirá al cuarto
+                ClientInfo clientInfo;
+                clientInfo.socket = client_socket;  // Asignar el socket del cliente
+                clientInfo.name = client_name;      // Asignar el nombre del cliente
+                clientInfo.status = client_status;  // Asignar el estado del cliente
+                Room::handle_join_room(new_room_name, clientInfo);
+            }
+            std::string response_str = response.dump();
+            send(client_socket, response_str.c_str(), response_str.length(), 0);
+
+        } else{
             // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
             std::lock_guard<std::mutex> lock(clients_mutex);
             for (const auto& client : clients) {

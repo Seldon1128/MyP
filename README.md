@@ -6,6 +6,7 @@ El Chat implementa las siguientes funcionalidades con palabras claves: (para acc
 1. Imprimir una lista de Usuarios con su respectivo estado: /USERS
 2. Cambiar el estado de un Usuario: /STATUS
 3. Enviar un mensaje privado: /TEXT
+4. Crear un cuarto: /NEW_ROOM
 
 Pasos para compilar el proyecto una vez descargado:  
 Situarse en carpeta build y seguir los comandos en terminal

@@ -8,6 +8,6 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(${PROJECT_SOURCE_DIR}/json-develop/include)
 
 # Agregar ejecutables
-add_executable(server server.cpp)
+add_executable(server server.cpp Room.cpp)
 add_executable(client client.cpp)
 

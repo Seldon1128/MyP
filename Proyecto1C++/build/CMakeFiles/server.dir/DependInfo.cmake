@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/Room.cpp" "CMakeFiles/server.dir/Room.o" "gcc" "CMakeFiles/server.dir/Room.o.d"
   "/Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/server.cpp" "CMakeFiles/server.dir/server.o" "gcc" "CMakeFiles/server.dir/server.o.d"
   )
 

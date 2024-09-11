@@ -43,8 +43,11 @@ void listen_for_messages(int socket) {
             }
         } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "TEXT" && message_json["result"] == "NO_SUCH_USER"){
             std::cout << "El nombre de usuario '" << message_json["extra"] << "' no existe." << std::endl;
-
-        }else if (message_json["type"] == "PUBLIC_TEXT_FROM"){ 
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "NEW_ROOM" && message_json["result"] == "SUCCESS"){
+            std::cout << "El cuarto " << message_json["extra"] << " se creo exitosamente." << std::endl;
+        } else  if (message_json["type"] == "RESPONSE" && message_json["operation"] == "NEW_ROOM" && message_json["result"] == "ROOM_ALREADY_EXISTS"){
+            std::cout << "El nombre del cuarto " << message_json["extra"] << " ya existe en el servidor." << std::endl;
+        } else if (message_json["type"] == "PUBLIC_TEXT_FROM"){ 
             std::string username = message_json["username"];
             std::string text = message_json["text"];
             std::cout << username << ": " << text << std::endl;
@@ -167,7 +170,18 @@ int main() {
             std::getline(std::cin, mensaje_priv);
             message_json["username"] = username_msg1;
             message_json["text"] = mensaje_priv;
-        }else {
+        }else if(uppercase_message == "/NEW_ROOM"){
+            message_json["type"] = "NEW_ROOM";
+            std::string roomname_msg;
+            do{
+                std::cout << "Ingresa el nombre del nuevo cuarto: ";
+                std::getline(std::cin, roomname_msg);
+                if (roomname_msg.length() > 16){
+                    std::cout << "El nombre excede el límite de 16 caracteres. Inténtalo de nuevo.\n";
+                }
+            }while(roomname_msg.length() > 16); // Repetir hasta que el nombre sea valido
+            message_json["roomname"] = roomname_msg;
+        }else{
         message_json["type"] = "PUBLIC_TEXT";
         message_json["text"] = message;
         }

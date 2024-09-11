@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/server.dir/Room.o"
+  "CMakeFiles/server.dir/Room.o.d"
   "CMakeFiles/server.dir/server.o"
   "CMakeFiles/server.dir/server.o.d"
   "server"

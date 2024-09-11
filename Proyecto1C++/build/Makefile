@@ -143,6 +143,21 @@ client/fast:
 .PHONY : client/fast
 
 # target to build an object file
+Room.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/Room.o
+.PHONY : Room.o
+
+# target to preprocess a source file
+Room.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/Room.i
+.PHONY : Room.i
+
+# target to generate assembly for a file
+Room.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/Room.s
+.PHONY : Room.s
+
+# target to build an object file
 client.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/client.o
 .PHONY : client.o
@@ -182,6 +197,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... client"
 	@echo "... server"
+	@echo "... Room.o"
+	@echo "... Room.i"
+	@echo "... Room.s"
 	@echo "... client.o"
 	@echo "... client.i"
 	@echo "... client.s"
