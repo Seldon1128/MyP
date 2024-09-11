@@ -16,6 +16,7 @@ struct ClientInfo {
 struct Room {
     std::string name;
     std::vector<ClientInfo> clientsRoom;
+    std::vector<std::string> usernamesInvited; // Lista de nombres de Invitados a la sala
 
     // Métodos estáticos
     static std::map<std::string, Room> rooms;
@@ -26,6 +27,9 @@ struct Room {
     static void handle_join_room(const std::string& room_name, ClientInfo& client);
     static void handle_room_text(const std::string& room_name, const std::string& message, const ClientInfo& sender);
     static void send_message(int socket, const std::string& message);
+    static bool is_user_in_room(const std::string& room_name, const std::string& client_name);
+    static bool is_user_invited(const std::string& room_name, const std::string& client_name);
+    static void add_user_to_invited(const std::string& room_name, const std::string& client_name);
 };
 
 #endif // ROOM_H

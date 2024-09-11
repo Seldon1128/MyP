@@ -212,6 +212,73 @@ void handle_client(int client_socket) {
             std::string response_str = response.dump();
             send(client_socket, response_str.c_str(), response_str.length(), 0);
 
+        } else if (message_json.contains("type") && message_json["type"] == "INVITE"){
+            // Similar a Manejo de Textos Privados comprobación si el usuario existe
+            std::string target_username = message_json["usernames"];
+            std::string room_name = message_json["roomname"];
+            bool user_found = false;
+
+            std::lock_guard<std::mutex> lock(clients_mutex); // Asegurar acceso exclusivo a la lista de clientes
+
+            // Inicializar un iterador para recorrer la lista de clientes
+            auto it = clients.begin();
+
+            // Recorrer la lista de clientes para buscar al destinatario
+            while (it != clients.end()) {
+            // Comprobar si el nombre del cliente actual coincide con el nombre del destinatario
+                if (it->name == target_username) {
+                    user_found = true;  // Usuario encontrado
+                    break;  // Salir del bucle
+                }
+                ++it;  // Avanzar al siguiente cliente en la lista
+            }
+
+            if (user_found){
+                // Checar si cuarto existe
+                if(Room::room_exists(room_name)){
+                    //Checar si el que envía invitacion esta en el cuarto
+                    if (Room::is_user_in_room(room_name, client_name)){
+                        // Checar si el usuario a invitar esta en el cuarto
+                        if (Room::is_user_invited(room_name, target_username)){
+                            // No hacer nada
+                        } else {
+                            // El usuario a invitar no esta en el cuarto y procedemos a invitarlo
+                            // Mandar mensaje
+                            json response;
+                            response["type"] = "INVITATION";
+                            response["username"] = client_name;
+                            response["roomname"] = room_name;
+                            std::string response_str = response.dump();
+                            send(it->socket, response_str.c_str(), response_str.length(), 0);
+                            // Agregarlo a la lista de invitados del cuarto
+                            Room::add_user_to_invited(room_name, target_username);
+
+                        }
+                    } else {
+                        // el que envia invitacion no esta en el cuarto
+                    }
+
+                } else {
+                    // enviar json NO_SUCH_ROOM
+                    json response;
+                    response["type"] = "RESPONSE";
+                    response["operation"] = "INVITE";
+                    response["result"] = "NO_SUCH_ROOM";
+                    response["extra"] = room_name;
+                    std::string response_str = response.dump();
+                    send(client_socket, response_str.c_str(), response_str.length(), 0);
+                }
+            } else {
+                // enviar json NO_SUCH_USER
+                json response;
+                response["type"] = "RESPONSE";
+                response["operation"] = "INVITE";
+                response["result"] = "NO_SUCH_USER";
+                response["extra"] = target_username;
+                std::string response_str = response.dump();
+                send(client_socket, response_str.c_str(), response_str.length(), 0);
+            }
+
         } else{
             // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
             std::lock_guard<std::mutex> lock(clients_mutex);

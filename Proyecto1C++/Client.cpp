@@ -51,12 +51,19 @@ void listen_for_messages(int socket) {
             std::string username = message_json["username"];
             std::string text = message_json["text"];
             std::cout << username << ": " << text << std::endl;
-
         }else if(message_json["type"] == "TEXT_FROM"){
             std::string username_priv = message_json["username"];
             std::string text_priv = message_json["text"];
             std::cout << "Mensaje Privado -> " << username_priv << ": " << text_priv << std::endl;
-        }else if(message_json["type"] == "USER_LIST"){
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "INVITE" && message_json["result"] == "NO_SUCH_USER"){
+            std::cout << "Invitacion fallida. El nombre de usuario " << message_json["extra"] << " no existe." << std::endl;
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "INVITE" && message_json["result"] == "NO_SUCH_ROOM"){
+            std::cout << "Invitacion fallida. El cuarto " << message_json["extra"] << " no existe." << std::endl;
+        } else if(message_json["type"] == "INVITATION"){
+            std::string username_inv = message_json["username"];
+            std::string roomname_inv = message_json["roomname"];
+            std::cout << "Invitacion a sala -> " << username_inv << ": " << roomname_inv << std::endl;
+        } else if (message_json["type"] == "USER_LIST"){
             std::cout << "Usuarios conectados y sus estados:\n";
             for (auto it = message_json["users"].begin(); it != message_json["users"].end(); ++it) {
                 std::string username = it.key();  // Nombre del usuario
@@ -163,10 +170,10 @@ int main() {
             message_json["type"] = "TEXT";
             std::string username_msg;
             std::string mensaje_priv;
-            std::cout << "Ingresa el username del usuario\n";
+            std::cout << "Ingresa el username del usuario: ";
             std::getline(std::cin, username_msg);
             std::string username_msg1 = trim(username_msg);
-            std::cout << "Ingresa el mensaje\n";
+            std::cout << "Ingresa el mensaje: ";
             std::getline(std::cin, mensaje_priv);
             message_json["username"] = username_msg1;
             message_json["text"] = mensaje_priv;
@@ -181,9 +188,19 @@ int main() {
                 }
             }while(roomname_msg.length() > 16); // Repetir hasta que el nombre sea valido
             message_json["roomname"] = roomname_msg;
-        }else{
-        message_json["type"] = "PUBLIC_TEXT";
-        message_json["text"] = message;
+        }else if(uppercase_message == "/INVITE"){
+            message_json["type"] = "INVITE";
+            std::string room_name;
+            std::string invite_username;
+            std::cout << "Ingresa el nombre del cuarto: ";
+            std::getline(std::cin, room_name);
+            std::cout << "Ingresa el username del usuario: ";
+            std::getline(std::cin, invite_username);
+            message_json["roomname"] = room_name;
+            message_json["usernames"] = invite_username;
+        } else {
+            message_json["type"] = "PUBLIC_TEXT";
+            message_json["text"] = message;
         }
 
         msg_to_send = message_json.dump();

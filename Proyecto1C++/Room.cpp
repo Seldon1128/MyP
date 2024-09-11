@@ -46,3 +46,58 @@ bool Room::room_exists(const std::string& room_name) {
     return rooms.find(room_name) != rooms.end();
 }
 
+// Verificar si un usuario está en el cuarto
+bool Room::is_user_in_room(const std::string& room_name, const std::string& client_name) {
+    std::lock_guard<std::mutex> lock(rooms_mutex);
+    auto it = rooms.find(room_name);
+    if (it != rooms.end()) {
+        const Room& room = it->second;
+        for (const auto& client : room.clientsRoom) {
+            if (client.name == client_name) {
+                return true; // Usuario encontrado en la lista de clientes
+            }
+        }
+    }
+    return false; // Usuario no encontrado en la lista de clientes
+}
+
+// Verificar si un usuario está en la lista de invitados
+bool Room::is_user_invited(const std::string& room_name, const std::string& client_name) {
+    std::lock_guard<std::mutex> lock(rooms_mutex);
+    auto it = rooms.find(room_name);
+    if (it != rooms.end()) {
+        const Room& room = it->second;
+        for (const auto& invited_name : room.usernamesInvited) {
+            if (invited_name == client_name) {
+                return true; // Usuario encontrado en la lista de invitados
+            }
+        }
+    }
+    return false; // Usuario no encontrado en la lista de invitados
+}
+
+// Método para agregar un usuario a la lista de invitados de un cuarto
+void Room::add_user_to_invited(const std::string& room_name, const std::string& client_name) {
+    // Proteger acceso concurrente a los cuartos con mutex
+    std::lock_guard<std::mutex> lock(rooms_mutex);
+
+    // Buscar si el cuarto existe
+    auto it = rooms.find(room_name);
+    
+    if (it != rooms.end()) {  // Si el cuarto existe
+        Room& room = it->second;  // Obtenemos la referencia al cuarto
+        
+        // Verificamos si el usuario ya está en la lista de invitados
+        if (std::find(room.usernamesInvited.begin(), room.usernamesInvited.end(), client_name) == room.usernamesInvited.end()) {
+            // Si no está, lo añadimos
+            room.usernamesInvited.push_back(client_name);
+        } else {
+            // Si ya está, no lo añadimos
+        }
+    } else {
+        // El cuarto no existe.
+    }
+}
+
+
+

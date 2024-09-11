@@ -7,6 +7,7 @@ El Chat implementa las siguientes funcionalidades con palabras claves: (para acc
 2. Cambiar el estado de un Usuario: /STATUS
 3. Enviar un mensaje privado: /TEXT
 4. Crear un cuarto: /NEW_ROOM
+5. Invitar usuarios a un cuarto: /INVITE (solo se puede invitar a uno a la vez)
 
 Pasos para compilar el proyecto una vez descargado:  
 Situarse en carpeta build y seguir los comandos en terminal
