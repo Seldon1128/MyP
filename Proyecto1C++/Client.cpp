@@ -72,15 +72,23 @@ void listen_for_messages(int socket) {
 }
 // Función para eliminar espacios al inicio y al final de una cadena
 std::string trim(const std::string& str) {
+    // Encuentra la primera posición que no sea un espacio en blanco
     size_t start = str.find_first_not_of(" \t\n\r\f\v");
+    // Encuentra la última posición que no sea un espacio en blanco
     size_t end = str.find_last_not_of(" \t\n\r\f\v");
+    // Si no se encuentra ningún carácter que no sea espacio, retorna una cadena vacía.
+    if (start == std::string::npos) {
+        return ""; 
+    }
 
-    return (start == std::string::npos) ? "" : str.substr(start, end - start + 1);
+    // Retorna la subcadena que está entre los caracteres que no son espacios
+    return str.substr(start, end - start + 1);
 }
 
 // Función para convertir una cadena a mayúsculas
 std::string to_upper(const std::string& str) {
     std::string result = str;
+    // Recorre cada carácter de la cadena y conviértelo a mayúsculas
     std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) { return std::toupper(c); });
     return result;
 }
@@ -100,8 +108,15 @@ int main() {
 
     // Pedir el nombre de usuario y enviar el mensaje de identificación
     std::string username;
-    std::cout << "Bienvenido. Por favor, ingresa tu nombre: ";
-    std::getline(std::cin, username);
+    do{
+        std::cout << "Bienvenido. Por favor, ingresa tu nombre: ";
+        std::getline(std::cin, username);
+
+        if (username.length() > 8){
+            std::cout << "El nombre excede el límite de 8 caracteres. Inténtalo de nuevo.\n";
+        }
+
+    }while(username.length() > 8); // Repetir hasta que el nombre sea valido
 
     // Crear un JSON de identificación
     json identify_message;
@@ -123,9 +138,9 @@ int main() {
         json message_json;
 
         // Agregar siguiente codigo para identificar el tipo de mensajes
-        if (uppercase_message == "USERS"){
+        if (uppercase_message == "/USERS"){
             message_json["type"] = "USERS";
-        } else if(uppercase_message == "STATUS"){
+        } else if(uppercase_message == "/STATUS"){
             message_json["type"] = "STATUS";
             std::string opcion;
             std::cout << "Seleccina el estado al que quieres cambiar: \n 1. ACTIVE \n 2. BUSY \n 3. AWAY \n";

@@ -40,6 +40,7 @@ void handle_client(int client_socket) {
 
     while (true) {
         ssize_t recv_len = recv(client_socket, buffer, sizeof(buffer), 0);
+        // if para en caso de cliente desconecto o error
         if (recv_len <= 0) {
             std::lock_guard<std::mutex> lock(clients_mutex);
             clients.erase(std::remove_if(clients.begin(), clients.end(), 
