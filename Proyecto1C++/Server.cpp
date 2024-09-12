@@ -279,7 +279,55 @@ void handle_client(int client_socket) {
                 send(client_socket, response_str.c_str(), response_str.length(), 0);
             }
 
-        } else{
+        } else if(message_json.contains("type") && message_json["type"] == "JOIN_ROOM"){
+            std::string room_name = message_json["roomname"];
+            if(Room::room_exists(room_name)){
+                if(Room::is_user_invited(room_name, client_name)){
+                    json response1;
+                    response1["type"] = "JOINED_ROOM";
+                    response1["roomname"] = room_name;
+                    response1["username"] = client_name;
+
+                    Room::broadcast_to_room(room_name, response1);
+
+                    // Crear e inicializar una instancia de ClientInfo para el cliente que se unirá al cuarto
+                    ClientInfo clientInfo;
+                    clientInfo.socket = client_socket;  // Asignar el socket del cliente
+                    clientInfo.name = client_name;      // Asignar el nombre del cliente
+                    clientInfo.status = client_status;  // Asignar el estado del cliente
+                    Room::handle_join_room(room_name, clientInfo);
+                    json response;
+                    response["type"] = "RESPONSE";
+                    response["operation"] = "JOIN_ROOM";
+                    response["result"] = "SUCCESS";
+                    response["extra"] = room_name;
+                    std::string response_str = response.dump();
+                    send(client_socket, response_str.c_str(), response_str.length(), 0);
+
+
+                } else {
+                    // JSON NOT_INVITED
+                    json response;
+                    response["type"] = "RESPONSE";
+                    response["operation"] = "JOIN_ROOM";
+                    response["result"] = "NOT_INVITED";
+                    response["extra"] = room_name;
+                    std::string response_str = response.dump();
+                    send(client_socket, response_str.c_str(), response_str.length(), 0);
+                }
+
+            }else{
+                // JSON NO_SUCH_ROOM
+                json response;
+                response["type"] = "RESPONSE";
+                response["operation"] = "JOIN_ROOM";
+                response["result"] = "NO_SUCH_ROOM";
+                response["extra"] = room_name;
+                std::string response_str = response.dump();
+                send(client_socket, response_str.c_str(), response_str.length(), 0);
+
+            }
+        } else {
             // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
             std::lock_guard<std::mutex> lock(clients_mutex);
             for (const auto& client : clients) {

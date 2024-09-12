@@ -6,6 +6,10 @@
 #include <vector>
 #include <mutex>
 #include <string>
+#include <nlohmann/json.hpp> // Para trabajar con JSON
+
+// Crear alias de json
+using json = nlohmann::json;
 
 struct ClientInfo {
     int socket;
@@ -30,6 +34,7 @@ struct Room {
     static bool is_user_in_room(const std::string& room_name, const std::string& client_name);
     static bool is_user_invited(const std::string& room_name, const std::string& client_name);
     static void add_user_to_invited(const std::string& room_name, const std::string& client_name);
+    static void broadcast_to_room(const std::string& room_name, const json& message_json);
 };
 
 #endif // ROOM_H

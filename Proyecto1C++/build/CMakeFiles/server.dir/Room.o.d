@@ -831,13 +831,7 @@ CMakeFiles/server.dir/Room.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/_types/_nl_item.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__locale_dir/locale_base_api/bsd_locale_defaults.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/cstdarg \
-  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/Room.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/map \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/is_transparent.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__iterator/ranges_iterator_traits.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__node_handle \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/optional \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__tree \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/json.hpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/functional \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/binary_negate.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/bind.h \
@@ -849,7 +843,11 @@ CMakeFiles/server.dir/Room.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/boyer_moore_searcher.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/array \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/unordered_map \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/is_transparent.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__hash_table \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__iterator/ranges_iterator_traits.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__node_handle \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/optional \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/vector \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__format/formatter.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__format/format_fwd.h \
@@ -885,4 +883,69 @@ CMakeFiles/server.dir/Room.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/not_fn.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/pointer_to_binary_function.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/pointer_to_unary_function.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/unary_negate.h
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__functional/unary_negate.h \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/adl_serializer.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/abi_macros.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/conversions/from_json.hpp \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/forward_list \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/map \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__tree \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/valarray \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/exceptions.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/value_t.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/macro_scope.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/detected.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/void_t.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/thirdparty/hedley/hedley.hpp \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/cassert \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/assert.h \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/string_escape.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/input/position_t.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/cpp_future.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/type_traits.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/iterators/iterator_traits.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/call_std/begin.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/call_std/end.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/json_fwd.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/string_concat.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/identity_tag.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/std_fs.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/conversions/to_json.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/iterators/iteration_proxy.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/byte_container_with_subtype.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/hash.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/input/binary_reader.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/input/input_adapters.hpp \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/numeric \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/accumulate.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/adjacent_difference.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/exclusive_scan.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/gcd_lcm.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/inclusive_scan.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/inner_product.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/iota.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/midpoint.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/partial_sum.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/pstl_reduce.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/transform_exclusive_scan.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/__numeric/transform_inclusive_scan.h \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/input/json_sax.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/input/lexer.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/meta/is_sax.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/input/parser.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/iterators/internal_iterator.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/iterators/primitive_iterator.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/iterators/iter_impl.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/iterators/json_reverse_iterator.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/json_custom_base_class.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/json_pointer.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/json_ref.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/output/binary_writer.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/output/output_adapters.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/output/serializer.hpp \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1/iomanip \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/conversions/to_chars.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/ordered_map.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/macro_unscope.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
+  /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/Room.h

@@ -59,7 +59,18 @@ void listen_for_messages(int socket) {
             std::cout << "Invitacion fallida. El nombre de usuario " << message_json["extra"] << " no existe." << std::endl;
         } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "INVITE" && message_json["result"] == "NO_SUCH_ROOM"){
             std::cout << "Invitacion fallida. El cuarto " << message_json["extra"] << " no existe." << std::endl;
-        } else if(message_json["type"] == "INVITATION"){
+        } else if(message_json["type"] == "RESPONSE" && message_json["operation"] == "JOIN_ROOM" && message_json["result"] == "SUCCESS"){
+            std::string roomname = message_json["extra"];
+            std::cout << "Cuarto: "<< roomname << " -> Ingreso exitoso a la sala."<< std::endl;
+        } else if(message_json["type"] == "JOINED_ROOM"){
+            std::string roomname = message_json["roomname"];
+            std::string username = message_json["username"];
+            std::cout << "Cuarto: "<< roomname << " -> el usuario: " << username << " ha ingresado a la sala."<< std::endl;
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "JOIN_ROOM" && message_json["result"] == "NO_SUCH_ROOM"){
+            std::cout << "Ingreso fallido. El cuarto " << message_json["extra"] << " no existe." << std::endl;
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "JOIN_ROOM" && message_json["result"] == "NOT_INVITED"){
+            std::cout << "Ingreso fallido. No estas invitado al cuarto: " << message_json["extra"] << "." << std::endl;
+        } else if (message_json["type"] == "INVITATION"){
             std::string username_inv = message_json["username"];
             std::string roomname_inv = message_json["roomname"];
             std::cout << "Invitacion a sala -> " << username_inv << ": " << roomname_inv << std::endl;
@@ -198,7 +209,13 @@ int main() {
             std::getline(std::cin, invite_username);
             message_json["roomname"] = room_name;
             message_json["usernames"] = invite_username;
-        } else {
+        } else if (uppercase_message == "/JOIN_ROOM"){
+            message_json["type"] = "JOIN_ROOM";
+            std :: string room_name;
+            std::cout << "Ingresa el nombre del cuarto: ";
+            std::getline(std::cin, room_name);
+            message_json["roomname"] = room_name;
+        }else{
             message_json["type"] = "PUBLIC_TEXT";
             message_json["text"] = message;
         }
