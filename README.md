@@ -12,6 +12,11 @@ El Chat implementa las siguientes funcionalidades con palabras claves: (para acc
 7. Imprimir una lista de Usuarios de un cuarto con su respectivo estado: /ROOM_USERS
 8. Enviar mensaje a un cuarto: /ROOM_TEXT
 9. Abandonar un cuarto: /LEAVE_ROOM
+10. Desconecta a un usuario del chat: /DISCONNECT
+
+Cosas que no implemente:
+1. Al invitar usuarios a un cuarto solo puedo invitar uno a la vez
+2. Al un usuario desconectarse del servidor no envio mensajes a los cuartos en los que estaba
 
 Pasos para compilar el proyecto una vez descargado:  
 Situarse en carpeta build y seguir los comandos en terminal

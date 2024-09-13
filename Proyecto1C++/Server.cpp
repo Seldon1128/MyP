@@ -28,6 +28,7 @@ void update_client_status(int client_socket, const std::string& new_status) {
     }
 }
 
+
 void handle_client(int client_socket) {
     char buffer[1024];
     std::string client_name;
@@ -38,8 +39,7 @@ void handle_client(int client_socket) {
         // if para en caso de cliente desconecto o error
         if (recv_len <= 0) {
             std::lock_guard<std::mutex> lock(clients_mutex);
-            clients.erase(std::remove_if(clients.begin(), clients.end(), 
-                [&](const ClientInfo& client) { return client.socket == client_socket; }), clients.end());
+            clients.erase(std::remove_if(clients.begin(), clients.end(), [&](const ClientInfo& client) { return client.socket == client_socket; }), clients.end());
             close(client_socket);
             break;
         }
@@ -420,6 +420,10 @@ void handle_client(int client_socket) {
             std::string room_name = message_json["roomname"];
             if(Room::room_exists(room_name)){
                 if(Room::is_user_in_room(room_name, client_name)){
+                    // Encontrar al cliente en la lista de clientes
+                    auto it_client = std::find_if(clients.begin(), clients.end(), [&](const ClientInfo& client) {
+                        return client.socket == client_socket;
+                    });
                     // JSON para enviar mensaje
                     json response;
                     response["type"] = "LEFT_ROOM";
@@ -431,6 +435,7 @@ void handle_client(int client_socket) {
 
                     // Sacar al cliente del cuarto
                     Room::remove_user_from_room(room_name, client_name);
+
 
 
                 }else{
@@ -456,7 +461,30 @@ void handle_client(int client_socket) {
             }
         
         
+        }else if(message_json.contains("type") && message_json["type"] == "DISCONNECT"){
+            
+
+            json response;
+            // Notificar a los demás clientes que un nuevo usuario se ha desconectado
+            response["type"] = "DISCONNECTED";
+            response["username"] = client_name;
+            // Representación en cadena del JSON
+            std::string response_str = response.dump();
+
+            for (const auto& client : clients) {
+                if (client.socket != client_socket) {
+                    send(client.socket, response_str.c_str(), response_str.length(), 0);
+                }
+            }
+
+            //Desconectar a cliente de servidor
+            std::lock_guard<std::mutex> lock(clients_mutex);
+            clients.erase(std::remove_if(clients.begin(), clients.end(), [&](const ClientInfo& client) { return client.socket == client_socket; }), clients.end());
+            close(client_socket);
+            break;
+            
         } else {
+
             // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
             std::lock_guard<std::mutex> lock(clients_mutex);
             for (const auto& client : clients) {

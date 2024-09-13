@@ -110,6 +110,13 @@ void listen_for_messages(int socket) {
             std::string username = message_json["username"];
             std::string roomname = message_json["roomname"];
             std::cout << "Sala -> " << roomname << ": " << username << " ha abandonado la sala" << std::endl;
+        } else if (message_json["type"] == "DISCONNECTED"){
+            std::string username = message_json["username"];
+            std::cout << "Servidor: " << username << " se ha desconectado del chat" << std::endl;
+        } else if (message_json["type"] == "LEFT_ROOM"){
+            std::string username = message_json["username"];
+            std::string roomname = message_json["roomname"];
+            std::cout << "Sala -> " << roomname << " : " << username << " ha abandonado la sala" << std::endl;
         } else if(message_json["type"] == "NEW_STATUS"){
             std::string username = message_json["username"];
             std::string status = message_json["status"];
@@ -148,8 +155,8 @@ int main() {
 
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(1234);
-    inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr);
+    server_address.sin_port = htons(1234); // modificar puerto
+    inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr); // modificar ip address
 
     connect(client_socket, (sockaddr*)&server_address, sizeof(server_address));
 
@@ -266,6 +273,8 @@ int main() {
             std::cout << "Ingresa el nombre del cuarto: ";
             std::getline(std::cin, room_name);
             message_json["roomname"] = room_name;
+        }else if(uppercase_message == "/DISCONNECT"){
+            message_json["type"] = "DISCONNECT";
         }else{
             message_json["type"] = "PUBLIC_TEXT";
             message_json["text"] = message;
