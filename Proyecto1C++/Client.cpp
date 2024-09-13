@@ -74,6 +74,17 @@ void listen_for_messages(int socket) {
             std::string username_inv = message_json["username"];
             std::string roomname_inv = message_json["roomname"];
             std::cout << "Invitacion a sala -> " << username_inv << ": " << roomname_inv << std::endl;
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "ROOM_USERS" && message_json["result"] == "NO_SUCH_ROOM"){
+            std::cout << "Solicitud fallida. El cuarto " << message_json["extra"] << " no existe." << std::endl;
+        }else if(message_json["type"] == "RESPONSE" && message_json["operation"] == "ROOM_USERS" && message_json["result"] == "NOT_JOINED"){
+            std::cout << "Solicitud fallida. No estas invitado al cuarto: " << message_json["extra"] << "." << std::endl;
+        } else if (message_json["type"] == "ROOM_USER_LIST"){
+            std::cout << "Usuarios conectados a "<< message_json["roomname"] <<"y sus estados:\n";
+            for (auto it = message_json["users"].begin(); it != message_json["users"].end(); ++it) {
+                std::string username = it.key();  // Nombre del usuario
+                std::string status = it.value();  // Estado del usuario
+                std::cout << username << ": " << status << std::endl;
+            }
         } else if (message_json["type"] == "USER_LIST"){
             std::cout << "Usuarios conectados y sus estados:\n";
             for (auto it = message_json["users"].begin(); it != message_json["users"].end(); ++it) {
@@ -211,6 +222,12 @@ int main() {
             message_json["usernames"] = invite_username;
         } else if (uppercase_message == "/JOIN_ROOM"){
             message_json["type"] = "JOIN_ROOM";
+            std :: string room_name;
+            std::cout << "Ingresa el nombre del cuarto: ";
+            std::getline(std::cin, room_name);
+            message_json["roomname"] = room_name;
+        }else if(uppercase_message == "/ROOM_USERS"){
+            message_json["type"] = "ROOM_USERS";
             std :: string room_name;
             std::cout << "Ingresa el nombre del cuarto: ";
             std::getline(std::cin, room_name);

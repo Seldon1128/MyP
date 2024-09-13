@@ -315,7 +315,6 @@ void handle_client(int client_socket) {
                     std::string response_str = response.dump();
                     send(client_socket, response_str.c_str(), response_str.length(), 0);
                 }
-
             }else{
                 // JSON NO_SUCH_ROOM
                 json response;
@@ -325,7 +324,59 @@ void handle_client(int client_socket) {
                 response["extra"] = room_name;
                 std::string response_str = response.dump();
                 send(client_socket, response_str.c_str(), response_str.length(), 0);
+            }
+        }else if(message_json.contains("type") && message_json["type"] == "ROOM_USERS"){
+            std::string room_name = message_json["roomname"];
+            if(Room::room_exists(room_name)){
+                if(Room::is_user_in_room(room_name, client_name)){
+                    // JSON para enviar la lista de usuarios del cuarto
+                    json response;
+                    response["type"] = "ROOM_USER_LIST";
+                    response["roomname"] = room_name;
+                    json users;
 
+                    {
+                        // Obtener la lista de usuarios en el cuarto
+                        std::lock_guard<std::mutex> lock(Room::rooms_mutex);
+                        const auto& room = Room::rooms[room_name];  // Obtiene la sala
+
+                        // Bloquear el acceso a la lista global de clientes (usuarios del servidor)
+                        std::lock_guard<std::mutex> lock_clients(clients_mutex);
+
+                        // Recorre la lista de clientes en la sala
+                        for (const auto& client : room.clientsRoom) {
+                            // Buscar el estado del usuario en la lista global de clientes del servidor
+                            auto it = std::find_if(clients.begin(), clients.end(), [&](const ClientInfo& c) {
+                                return c.name == client.name;
+                            });
+                            // Si el usuario se encuentra en la lista global, agrega su estado
+                            if (it != clients.end()) {
+                                users[client.name] = it->status;  // Añadir el estado del usuario
+                            } 
+                        }
+                    }
+                    response["users"] = users;  // Añadir lista de usuarios con sus estados
+                    std::string response_str = response.dump();
+                    send(client_socket, response_str.c_str(), response_str.length(), 0);
+                } else{
+                    //json not joined
+                    json response;
+                    response["type"] = "RESPONSE";
+                    response["operation"] = "ROOM_USERS";
+                    response["result"] = "NOT_JOINED";
+                    response["extra"] = room_name;
+                    std::string response_str = response.dump();
+                    send(client_socket, response_str.c_str(), response_str.length(), 0);
+                }
+            } else {
+                //json no such room
+                json response;
+                response["type"] = "RESPONSE";
+                response["operation"] = "ROOM_USERS";
+                response["result"] = "NO_SUCH_ROOM";
+                response["extra"] = room_name;
+                std::string response_str = response.dump();
+                send(client_socket, response_str.c_str(), response_str.length(), 0);
             }
         } else {
             // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
