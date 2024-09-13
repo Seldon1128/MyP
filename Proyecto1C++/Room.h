@@ -35,6 +35,7 @@ struct Room {
     static bool is_user_invited(const std::string& room_name, const std::string& client_name);
     static void add_user_to_invited(const std::string& room_name, const std::string& client_name);
     static void broadcast_to_room(const std::string& room_name, const json& message_json, int sender_socket);
+    static void remove_user_from_room(const std::string& room_name, const std::string& client_name);
 };
 
 #endif // ROOM_H

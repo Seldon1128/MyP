@@ -118,5 +118,23 @@ void Room::broadcast_to_room(const std::string& room_name, const json& message_j
     }
 }
 
+void Room::remove_user_from_room(const std::string& room_name, const std::string& client_name) {
+    std::lock_guard<std::mutex> lock(rooms_mutex); // Proteger acceso a 'rooms'
+
+    // Verifica si el cuarto existe
+    if (rooms.find(room_name) != rooms.end()) {
+        Room& room = rooms[room_name];
+
+        // Iterar sobre la lista de clientes en la sala
+        for (auto it = room.clientsRoom.begin(); it != room.clientsRoom.end(); ++it) {
+            // Verificar si el nombre del cliente coincide
+            if (it->name == client_name) {
+                room.clientsRoom.erase(it);  // Eliminar cliente de la sala
+                break;  // Salir del ciclo, ya que encontramos y eliminamos al cliente
+            }
+        }
+    }
+}
+
 
 

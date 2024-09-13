@@ -416,6 +416,46 @@ void handle_client(int client_socket) {
                 send(client_socket, response_str.c_str(), response_str.length(), 0);
             }
 
+        } else if(message_json.contains("type") && message_json["type"] == "LEAVE_ROOM"){
+            std::string room_name = message_json["roomname"];
+            if(Room::room_exists(room_name)){
+                if(Room::is_user_in_room(room_name, client_name)){
+                    // JSON para enviar mensaje
+                    json response;
+                    response["type"] = "LEFT_ROOM";
+                    response["roomname"] = room_name;
+                    response["username"] = client_name;
+
+                    // Enviar el mensaje a todos los clientes en el cuarto excepto al emisor
+                    Room::broadcast_to_room(room_name, response, client_socket);
+
+                    // Sacar al cliente del cuarto
+                    Room::remove_user_from_room(room_name, client_name);
+
+
+                }else{
+                    //json not joined
+                    json response;
+                    response["type"] = "RESPONSE";
+                    response["operation"] = "LEAVE_ROOM";
+                    response["result"] = "NOT_JOINED";
+                    response["extra"] = room_name;
+                    std::string response_str = response.dump();
+                    send(client_socket, response_str.c_str(), response_str.length(), 0);
+                }
+                
+            }else{
+                // JSON NO_SUCH_ROOM
+                json response;
+                response["type"] = "RESPONSE";
+                response["operation"] = "LEAVE_ROOM";
+                response["result"] = "NO_SUCH_ROOM";
+                response["extra"] = room_name;
+                std::string response_str = response.dump();
+                send(client_socket, response_str.c_str(), response_str.length(), 0);
+            }
+        
+        
         } else {
             // Reenviar el mensaje a todos los clientes excepto al emisor, el json se presenta entero en este else
             std::lock_guard<std::mutex> lock(clients_mutex);
