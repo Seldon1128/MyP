@@ -92,6 +92,16 @@ void listen_for_messages(int socket) {
                 std::string status = it.value();  // Estado del usuario
                 std::cout << username << ": " << status << std::endl;
             }
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "ROOM_TEXT" && message_json["result"] == "NO_SUCH_ROOM"){
+            std::cout << "Solicitud fallida. El cuarto " << message_json["extra"] << " no existe." << std::endl;
+        } else if (message_json["type"] == "RESPONSE" && message_json["operation"] == "ROOM_TEXT" && message_json["result"] == "NOT_JOINED"){
+            std::cout << "Solicitud fallida. No se ha unido al cuarto: " << message_json["extra"] << "." << std::endl;
+        } else if (message_json["type"] == "ROOM_TEXT_FROM"){
+            std::string username = message_json["username"];
+            std::string roomname = message_json["roomname"];
+            std::string text = message_json["text"];
+            std::cout << "Sala -> " << roomname << " | " << username << ": " << text << std::endl;
+
         } else if(message_json["type"] == "NEW_STATUS"){
             std::string username = message_json["username"];
             std::string status = message_json["status"];
@@ -232,6 +242,16 @@ int main() {
             std::cout << "Ingresa el nombre del cuarto: ";
             std::getline(std::cin, room_name);
             message_json["roomname"] = room_name;
+        }else if(uppercase_message == "/ROOM_TEXT"){
+            message_json["type"] = "ROOM_TEXT";
+            std :: string room_name;
+            std :: string text_msg;
+            std::cout << "Ingresa el nombre del cuarto: ";
+            std::getline(std::cin, room_name);
+            message_json["roomname"] = room_name;
+            std::cout << "Ingresa el mensaje: ";
+            std::getline(std::cin, text_msg);
+            message_json["text"] = text_msg;
         }else{
             message_json["type"] = "PUBLIC_TEXT";
             message_json["text"] = message;

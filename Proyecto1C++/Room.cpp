@@ -100,8 +100,8 @@ void Room::add_user_to_invited(const std::string& room_name, const std::string& 
     }
 }
 
-// Función para enviar un JSON a todos los clientes en un cuarto
-void Room::broadcast_to_room(const std::string& room_name, const json& message_json) {
+// Función para enviar un JSON a todos los clientes en un cuarto excepto al emisor
+void Room::broadcast_to_room(const std::string& room_name, const json& message_json, int sender_socket) {
     std::lock_guard<std::mutex> lock(rooms_mutex); // Proteger acceso concurrente a 'rooms'
 
     // Convertir el JSON en una cadena
@@ -110,10 +110,13 @@ void Room::broadcast_to_room(const std::string& room_name, const json& message_j
     // Obtener el cuarto (ya se asume que existe)
     Room& room = rooms[room_name];
 
-    // Enviar el mensaje a todos los clientes en el cuarto
+    // Enviar el mensaje a todos los clientes en el cuarto excepto al que lo mandó
     for (const auto& client : room.clientsRoom) {
-        send(client.socket, message_str.c_str(), message_str.length(), 0);
+        if (client.socket != sender_socket) {
+            send(client.socket, message_str.c_str(), message_str.length(), 0);
+        }
     }
 }
+
 
 

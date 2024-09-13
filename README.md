@@ -10,6 +10,7 @@ El Chat implementa las siguientes funcionalidades con palabras claves: (para acc
 5. Invitar usuarios a un cuarto: /INVITE (solo se puede invitar a uno a la vez)
 6. Entrar a un cuarto: /JOIN_ROOM
 7. Imprimir una lista de Usuarios de un cuarto con su respectivo estado: /ROOM_USERS
+8. Enviar mensaje a un cuarto: /ROOM_TEXT
 
 Pasos para compilar el proyecto una vez descargado:  
 Situarse en carpeta build y seguir los comandos en terminal
