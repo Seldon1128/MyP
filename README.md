@@ -17,6 +17,9 @@ El Chat implementa las siguientes funcionalidades con palabras claves: (para acc
 Cosas que no implemente:
 1. Al un usuario desconectarse del servidor no envio mensajes a los cuartos en los que estaba
 
+Para modificar la dirección ip del server modificar linea 515 y el puerto en la 512 del server
+Para modificar la dirección ip del cliente modificar linea 165 y el puerto en la 164
+
 Pasos para compilar el proyecto una vez descargado:  
 Situarse en carpeta build y seguir los comandos en terminal
 

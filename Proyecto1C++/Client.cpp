@@ -10,6 +10,12 @@
 
 using json = nlohmann::json;
 
+/**
+* Esta función escucha continuamente los mensajes entrantes desde el servidor.
+* Se ejecuta en un hilo separado para permitir la recepción de mensajes mientras el cliente sigue interactuando.
+*
+* @throws IOException Si ocurre un error al leer los datos del servidor.
+*/
 void listen_for_messages(int socket) {
     char buffer[1024];
     while (true) {
