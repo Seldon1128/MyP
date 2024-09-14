@@ -8,7 +8,10 @@ std::map<std::string, Room> Room::rooms;
 std::mutex Room::rooms_mutex;
 
 
-//Hacer un nuevo cuarto
+/**
+ * @brief Crea un nuevo cuarto si no existe.
+ * @param room_name Nombre del cuarto que se desea crear.
+ */
 void Room::handle_new_room(const std::string& room_name) {
     std::lock_guard<std::mutex> lock(rooms_mutex);
     if (rooms.find(room_name) == rooms.end()) {
@@ -16,7 +19,11 @@ void Room::handle_new_room(const std::string& room_name) {
     }
 }
 
-//Entrar a un cuarto
+/**
+ * @brief Agrega un cliente a un cuarto existente.
+ * @param room_name Nombre del cuarto al cual se desea unir.
+ * @param client Referencia al objeto ClientInfo que contiene la información del cliente.
+ */
 void Room::handle_join_room(const std::string& room_name, ClientInfo& client) {
     std::lock_guard<std::mutex> lock(rooms_mutex);
     if (rooms.find(room_name) != rooms.end()) {
@@ -24,7 +31,12 @@ void Room::handle_join_room(const std::string& room_name, ClientInfo& client) {
     }
 }
 
-//Mensaje en un cuarto
+/**
+ * @brief Envía un mensaje a todos los clientes de una sala.
+ * @param room_name Nombre del cuarto al cual se enviará el mensaje.
+ * @param message Mensaje que se enviará.
+ * @param sender Información del cliente que envía el mensaje.
+ */
 void Room::handle_room_text(const std::string& room_name, const std::string& message, const ClientInfo& sender) {
     std::lock_guard<std::mutex> lock(rooms_mutex);
     if (rooms.find(room_name) != rooms.end()) {
@@ -36,18 +48,31 @@ void Room::handle_room_text(const std::string& room_name, const std::string& mes
     }
 }
 
-// send_message
+/**
+ * @brief Envía un mensaje a través de un socket.
+ * @param socket El descriptor de archivo del socket.
+ * @param message Mensaje que se enviará.
+ */
 void Room::send_message(int socket, const std::string& message) {
     send(socket, message.c_str(), message.size(), 0);
 }
 
-// Implementación del método para verificar si un cuarto existe
+/**
+ * @brief Verifica si un cuarto existe.
+ * @param room_name Nombre del cuarto a verificar.
+ * @return true si el cuarto existe, false en caso contrario.
+ */
 bool Room::room_exists(const std::string& room_name) {
     std::lock_guard<std::mutex> lock(rooms_mutex);
     return rooms.find(room_name) != rooms.end();
 }
 
-// Verificar si un usuario está en el cuarto
+/**
+ * @brief Verifica si un usuario está en un cuarto.
+ * @param room_name Nombre del cuarto.
+ * @param client_name Nombre del cliente.
+ * @return true si el usuario está en el cuarto, false si no lo está.
+ */
 bool Room::is_user_in_room(const std::string& room_name, const std::string& client_name) {
     std::lock_guard<std::mutex> lock(rooms_mutex);
     auto it = rooms.find(room_name);
@@ -62,7 +87,12 @@ bool Room::is_user_in_room(const std::string& room_name, const std::string& clie
     return false; // Usuario no encontrado en la lista de clientes
 }
 
-// Verificar si un usuario está en la lista de invitados
+/**
+ * @brief Verifica si un usuario está invitado a un cuarto.
+ * @param room_name Nombre del cuarto.
+ * @param client_name Nombre del cliente.
+ * @return true si el cliente está en la lista de invitados, false en caso contrario.
+ */
 bool Room::is_user_invited(const std::string& room_name, const std::string& client_name) {
     std::lock_guard<std::mutex> lock(rooms_mutex);
     auto it = rooms.find(room_name);
@@ -77,7 +107,11 @@ bool Room::is_user_invited(const std::string& room_name, const std::string& clie
     return false; // Usuario no encontrado en la lista de invitados
 }
 
-// Método para agregar un usuario a la lista de invitados de un cuarto
+/**
+ * @brief Añade un usuario a la lista de invitados de un cuarto.
+ * @param room_name Nombre del cuarto.
+ * @param client_name Nombre del cliente que será invitado.
+ */
 void Room::add_user_to_invited(const std::string& room_name, const std::string& client_name) {
     // Proteger acceso concurrente a los cuartos con mutex
     std::lock_guard<std::mutex> lock(rooms_mutex);
@@ -100,7 +134,12 @@ void Room::add_user_to_invited(const std::string& room_name, const std::string& 
     }
 }
 
-// Función para enviar un JSON a todos los clientes en un cuarto excepto al emisor
+/**
+ * @brief Envía un mensaje JSON a todos los clientes en un cuarto excepto al emisor.
+ * @param room_name Nombre del cuarto.
+ * @param message_json Mensaje en formato JSON.
+ * @param sender_socket Socket del cliente que envía el mensaje.
+ */
 void Room::broadcast_to_room(const std::string& room_name, const json& message_json, int sender_socket) {
     std::lock_guard<std::mutex> lock(rooms_mutex); // Proteger acceso concurrente a 'rooms'
 
@@ -118,6 +157,11 @@ void Room::broadcast_to_room(const std::string& room_name, const json& message_j
     }
 }
 
+/**
+ * @brief Elimina un usuario de un cuarto.
+ * @param room_name Nombre del cuarto.
+ * @param client_name Nombre del cliente a eliminar.
+ */
 void Room::remove_user_from_room(const std::string& room_name, const std::string& client_name) {
     std::lock_guard<std::mutex> lock(rooms_mutex); // Proteger acceso a 'rooms'
 

@@ -914,6 +914,7 @@ CMakeFiles/server.dir/server.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/sys/_types/_socklen_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/sys/_types/_iovec_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/netinet6/in6.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/arpa/inet.h \
   /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/json.hpp \
   /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/adl_serializer.hpp \
   /Users/seldonsauttoramirez/desktop/MyP/Proyecto1C++/json-develop/include/nlohmann/detail/abi_macros.hpp \

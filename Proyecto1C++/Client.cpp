@@ -156,7 +156,7 @@ int main() {
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(1234); // modificar puerto
-    inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr); // modificar ip address
+    inet_pton(AF_INET, "192.168.0.73", &server_address.sin_addr); // modificar ip address
 
     connect(client_socket, (sockaddr*)&server_address, sizeof(server_address));
 
@@ -239,12 +239,19 @@ int main() {
             message_json["type"] = "INVITE";
             std::string room_name;
             std::string invite_username;
+            std::vector<std::string> usernames; // Vector para almacenar los usuarios a invitar
+            std::string add_more;
             std::cout << "Ingresa el nombre del cuarto: ";
             std::getline(std::cin, room_name);
-            std::cout << "Ingresa el username del usuario: ";
-            std::getline(std::cin, invite_username);
             message_json["roomname"] = room_name;
-            message_json["usernames"] = invite_username;
+            do{
+                std::cout << "Ingresa el username del usuario: ";
+                std::getline(std::cin, invite_username);
+                usernames.push_back(invite_username);
+                std::cout << "¿Quieres agregar otro usuario? (Si/No): ";
+                std::getline(std::cin, add_more);
+            }while(add_more == "SI" || add_more == "si" || add_more == "Si");
+            message_json["usernames"] = usernames;
         } else if (uppercase_message == "/JOIN_ROOM"){
             message_json["type"] = "JOIN_ROOM";
             std :: string room_name;

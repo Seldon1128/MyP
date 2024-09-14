@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <algorithm>
+#include <arpa/inet.h>  
 #include <nlohmann/json.hpp>
 #include "Room.h"
 
@@ -29,7 +30,7 @@ void update_client_status(int client_socket, const std::string& new_status) {
 }
 
 
-void handle_client(int client_socket) {
+void handle_client(int client_socket){
     char buffer[1024];
     std::string client_name;
     std::string client_status = "ACTIVE";
@@ -212,73 +213,75 @@ void handle_client(int client_socket) {
             std::string response_str = response.dump();
             send(client_socket, response_str.c_str(), response_str.length(), 0);
 
-        } else if (message_json.contains("type") && message_json["type"] == "INVITE"){
-            // Similar a Manejo de Textos Privados comprobación si el usuario existe
-            std::string target_username = message_json["usernames"];
-            std::string room_name = message_json["roomname"];
-            bool user_found = false;
+        }  else if (message_json.contains("type") && message_json["type"] == "INVITE") {
+            // Verificar si "usernames" es un array de usuarios
+            if (message_json["usernames"].is_array()) {
+                // Iterar sobre cada usuario en el array
+                for (const auto& target_username_json : message_json["usernames"]) {
+                    std::string target_username = target_username_json;  // Extraer el nombre del usuario actual
+                    std::string room_name = message_json["roomname"];
+                    bool user_found = false;
 
-            std::lock_guard<std::mutex> lock(clients_mutex); // Asegurar acceso exclusivo a la lista de clientes
+                    std::lock_guard<std::mutex> lock(clients_mutex); // Asegurar acceso exclusivo a la lista de clientes
 
-            // Inicializar un iterador para recorrer la lista de clientes
-            auto it = clients.begin();
+                    // Inicializar un iterador para recorrer la lista de clientes
+                    auto it = clients.begin();
 
-            // Recorrer la lista de clientes para buscar al destinatario
-            while (it != clients.end()) {
-            // Comprobar si el nombre del cliente actual coincide con el nombre del destinatario
-                if (it->name == target_username) {
-                    user_found = true;  // Usuario encontrado
-                    break;  // Salir del bucle
-                }
-                ++it;  // Avanzar al siguiente cliente en la lista
-            }
-
-            if (user_found){
-                // Checar si cuarto existe
-                if(Room::room_exists(room_name)){
-                    //Checar si el que envía invitacion esta en el cuarto
-                    if (Room::is_user_in_room(room_name, client_name)){
-                        // Checar si el usuario a invitar esta en el cuarto
-                        if (Room::is_user_invited(room_name, target_username)){
-                            // No hacer nada
-                        } else {
-                            // El usuario a invitar no esta en el cuarto y procedemos a invitarlo
-                            // Mandar mensaje
-                            json response;
-                            response["type"] = "INVITATION";
-                            response["username"] = client_name;
-                            response["roomname"] = room_name;
-                            std::string response_str = response.dump();
-                            send(it->socket, response_str.c_str(), response_str.length(), 0);
-                            // Agregarlo a la lista de invitados del cuarto
-                            Room::add_user_to_invited(room_name, target_username);
-
+                    // Recorrer la lista de clientes para buscar al destinatario
+                    while (it != clients.end()) {
+                        // Comprobar si el nombre del cliente actual coincide con el nombre del destinatario
+                        if (it->name == target_username) {
+                            user_found = true;  // Usuario encontrado
+                            break;  // Salir del bucle
                         }
-                    } else {
-                        // el que envia invitacion no esta en el cuarto
+                        ++it;  // Avanzar al siguiente cliente en la lista
                     }
 
-                } else {
-                    // enviar json NO_SUCH_ROOM
-                    json response;
-                    response["type"] = "RESPONSE";
-                    response["operation"] = "INVITE";
-                    response["result"] = "NO_SUCH_ROOM";
-                    response["extra"] = room_name;
-                    std::string response_str = response.dump();
-                    send(client_socket, response_str.c_str(), response_str.length(), 0);
-                }
-            } else {
-                // enviar json NO_SUCH_USER
-                json response;
-                response["type"] = "RESPONSE";
-                response["operation"] = "INVITE";
-                response["result"] = "NO_SUCH_USER";
-                response["extra"] = target_username;
-                std::string response_str = response.dump();
-                send(client_socket, response_str.c_str(), response_str.length(), 0);
-            }
+                    if (user_found) {
+                        // Checar si el cuarto existe
+                        if (Room::room_exists(room_name)) {
+                            // Checar si el que envía la invitación está en el cuarto
+                            if (Room::is_user_in_room(room_name, client_name)) {
+                                // Checar si el usuario a invitar está en el cuarto
+                                if (Room::is_user_invited(room_name, target_username)) {
+                                    // No hacer nada, ya está invitado
+                                } else {
+                                    // El usuario a invitar no está en el cuarto, proceder a invitarlo
+                                    // Mandar mensaje
+                                    json response;
+                                    response["type"] = "INVITATION";
+                                    response["username"] = client_name;
+                                    response["roomname"] = room_name;
+                                    std::string response_str = response.dump();
+                                    send(it->socket, response_str.c_str(), response_str.length(), 0);
 
+                                    // Agregarlo a la lista de invitados del cuarto
+                                    Room::add_user_to_invited(room_name, target_username);
+                                }
+                            }
+                        } else {
+                            // Enviar JSON NO_SUCH_ROOM
+                            json response;
+                            response["type"] = "RESPONSE";
+                            response["operation"] = "INVITE";
+                            response["result"] = "NO_SUCH_ROOM";
+                            response["extra"] = room_name;
+                            std::string response_str = response.dump();
+                            send(client_socket, response_str.c_str(), response_str.length(), 0);
+                        }
+                    } else {
+                        // Enviar JSON NO_SUCH_USER si no encuentra al usuario
+                        json response;
+                        response["type"] = "RESPONSE";
+                        response["operation"] = "INVITE";
+                        response["result"] = "NO_SUCH_USER";
+                        response["extra"] = target_username;
+                        std::string response_str = response.dump();
+                        send(client_socket, response_str.c_str(), response_str.length(), 0);
+                    }
+                }
+            }
+    
         } else if(message_json.contains("type") && message_json["type"] == "JOIN_ROOM"){
             std::string room_name = message_json["roomname"];
             if(Room::room_exists(room_name)){
@@ -436,8 +439,6 @@ void handle_client(int client_socket) {
                     // Sacar al cliente del cuarto
                     Room::remove_user_from_room(room_name, client_name);
 
-
-
                 }else{
                     //json not joined
                     json response;
@@ -498,26 +499,57 @@ void handle_client(int client_socket) {
 }
 
 int main() {
+    // Crear el socket del servidor
     int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-
-    sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(1234);
-    server_address.sin_addr.s_addr = INADDR_ANY;
-
-    bind(server_socket, (sockaddr*)&server_address, sizeof(server_address));
-    listen(server_socket, 5);
-
-    std::cout << "Server is listening on port 1234..." << std::endl;
-
-    while (true) {
-        int client_socket = accept(server_socket, nullptr, nullptr);
-        std::cout << "New client connected!" << std::endl;
-
-        std::thread client_thread(handle_client, client_socket);
-        client_thread.detach();
+    if (server_socket == -1) {
+        std::cerr << "Error al crear el socket." << std::endl;
+        return 1;
     }
 
+    // Definir la dirección del servidor
+    sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(1234); // Puerto que se utilizará
+
+    // Especificar la dirección IP en la que el servidor escuchará
+    const char* ip_address = "192.168.0.73"; // Cambia esto por la IP que deseas
+    if (inet_pton(AF_INET, ip_address, &server_address.sin_addr) <= 0) {
+        std::cerr << "Error: Dirección IP inválida." << std::endl;
+        close(server_socket);
+        return 1;
+    }
+
+    // Enlazar el socket con la dirección y el puerto
+    if (bind(server_socket, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
+        std::cerr << "Error al enlazar el socket: " << strerror(errno) << std::endl;
+        close(server_socket);
+        return 1;
+    }
+
+    // Poner el socket en modo escucha
+    if (listen(server_socket, 5) == -1) {
+        std::cerr << "Error al poner el socket en modo escucha: " << strerror(errno) << std::endl;
+        close(server_socket);
+        return 1;
+    }
+
+    std::cout << "Servidor escuchando en la dirección " << ip_address << " y puerto 1234..." << std::endl;
+
+    // Bucle principal para aceptar conexiones de clientes
+    while (true) {
+        int client_socket = accept(server_socket, nullptr, nullptr);
+        if (client_socket == -1) {
+            std::cerr << "Error al aceptar la conexión: " << strerror(errno) << std::endl;
+            continue;
+        }
+        std::cout << "¡Nuevo cliente conectado!" << std::endl;
+
+        // Crear un nuevo hilo para manejar la comunicación con el cliente
+        std::thread client_thread(handle_client, client_socket);
+        client_thread.detach(); // Desconectamos el hilo para que se maneje independientemente
+    }
+
+    // Cerrar el socket del servidor (nunca se llegará aquí en este código)
     close(server_socket);
     return 0;
 }
