@@ -17,16 +17,31 @@ El Chat implementa las siguientes funcionalidades con palabras claves: (para acc
 Cosas que no implemente:
 1. Al un usuario desconectarse del servidor no envio mensajes a los cuartos en los que estaba
 
+Para compilar el proyecto se usa clang, verificar la instalacion del compilador
+1. Abrir en terminal y ejecutar: clang++ --version
+2. Si no aparece información sobre clang, instala las herramientas de Xcode ejecutando: xcode-select --install
+
+Pasos para compilar el proyecto una vez descargado:  
+
+Antes que nada modificar la dirección ip y el puerto del server y el cliente:
+
 Para modificar la dirección ip del server modificar linea 515 y el puerto en la 512 del server
 Para modificar la dirección ip del cliente modificar linea 165 y el puerto en la 164
 
-Pasos para compilar el proyecto una vez descargado:  
-Situarse en carpeta build y seguir los comandos en terminal
 
-cmake ..
+Situarse en carpeta Proyecto1C++ y seguir los comandos en terminal
 
-cmake --build .
+Limpiar el directorio de compilacion:
+1. rm -rf build
+2. mkdir build
+3. cd build
 
-./server
+Situarse en el directorio de compilacion build:
 
-./client
+4. Configurar CMake especificando el compilador: cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ..
+5. Construir: cmake --build .
+
+6. ./server
+
+En otras terminales ubicarse en el directorio build y correr el cliente (pueden ser varias terminales o de diferente compu)
+7. /client
