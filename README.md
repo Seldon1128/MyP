@@ -17,16 +17,28 @@ El Chat implementa las siguientes funcionalidades con palabras claves: (para acc
 Cosas que no implemente:
 1. Al un usuario desconectarse del servidor no envio mensajes a los cuartos en los que estaba
 
-Para modificar la dirección ip del server modificar linea 515 y el puerto en la 512 del server
-Para modificar la dirección ip del cliente modificar linea 165 y el puerto en la 164
+Requisitos:
+1. Tener gcc el compilador instalado ademas de g++ para c++
 
 Pasos para compilar el proyecto una vez descargado:  
-Situarse en carpeta build y seguir los comandos en terminal
 
-cmake ..
+1. En la carpeta Proyecto1C++ cambiar la direccion de ip y puerto del server y el cliente
 
-cmake --build .
+Para modificar la dirección ip del server modificar linea 515 y el puerto en la 512 del server, de Server.cpp
 
-./server
+Para modificar la dirección ip del cliente modificar linea 165 y el puerto en la 164, de Client.cpp
+
+2. Situarse en carpeta build y seguir los comandos en terminal
+
+3. Para configurar el cmake es: cmake
+- DCMAKE_C_COMPILER=gcc
+- DCMAKE_CXX_COMPILER=g++..
+
+4. make 
+
+
+5. ./server
+
+en otras terminales a la misma altura ejecutar: 
 
 ./client
